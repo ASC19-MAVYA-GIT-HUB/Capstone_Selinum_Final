@@ -1,16 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Automation Suite" verbose="1" parallel="false" thread-count="1">
-<test name="End-to-End Tests">
-<classes>
-<class name="com.capstone.tests.LoginTest"/>
-<class name="com.capstone.tests.SearchTest"/>
-<class name="com.capstone.tests.AddToCartTest"/>
-<class name="com.capstone.tests.CartQuantityTest"/>
-<class name="com.capstone.tests.RemoveFromCartTest"/>
-<class name="com.capstone.tests.SmokeTest"/>
-<class name="com.capstone.tests.CheckoutTest"/>
-</classes>
-</test>
-</suite>
-
- 
+<suite name="Suite">
+  <test thread-count="5" name="Test">
+    <classes>
+      <class name="com.ajio.tests.ExcelDrivenSearchAjio"/>
+      <class name="com.ajio.tests.LoginAjio"/>
+      <class name="com.ajio.tests.SearchAjio"/>
+      <class name="com.ajio.tests.CartQuantityAjio"/>
+      <class name="com.ajio.tests.RemoveFromCartAjio"/>
+      <class name="com.ajio.tests.SmokeTest"/>
+      <class name="com.ajio.tests.CheckoutAjio"/>
+      <class name="com.ajio.tests.AddToCartAjio"/>
+    </classes>
+  </test> <!-- Test -->
+</suite> <!-- Suite -->
