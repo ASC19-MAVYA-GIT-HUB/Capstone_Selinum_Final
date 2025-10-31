@@ -1,58 +1,87 @@
 package com.ajio.tests;
-
+ 
 import org.testng.annotations.Test;
+
 import com.ajio.base.BaseTest;
-import com.ajio.pages.ProductPage;
-import com.ajio.pages.CartPage;
+
 import com.ajio.utilities.ScreenshotUtil;
 
 import java.time.Duration;
-import java.util.NoSuchElementException;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.ElementClickInterceptedException;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+
 import org.openqa.selenium.support.ui.ExpectedConditions;
+
 import org.openqa.selenium.support.ui.WebDriverWait;
-
+ 
 public class CartQuantityAjio extends BaseTest {
-
+ 
     @Test
+
     public void increaseQuantityInCart() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+
+        By plusBtn = By.xpath("//*[@id='dCartWrapper']/div[2]/div[2]/div[1]/div[3]/div[2]/div/div[2]/div[2]/div[2]/span");
+ 
         try {
-            // 🧱 Wait for loader to disappear (if any)
-            wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("div.loader")));
 
-            // 💤 Let DOM settle
-            Thread.sleep(2000);
+            // 🧱 Wait for any loader or overlay to disappear
 
-            // 🔍 Locate quantity + button
-            By plusBtn = By.xpath("//*[contains(@aria-label,'increase') or contains(@class,'plus') or contains(text(),'+')]");
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(
 
-            // ✅ Wait for presence first
-            wait.until(ExpectedConditions.presenceOfElementLocated(plusBtn));
+                    By.cssSelector("div.loader, div.spinner, div[role='dialog']")));
+ 
+            // 🔍 Wait until the + button is visible and interactable
 
-            // ✅ Then wait for clickability
-            WebElement increaseBtn = wait.until(ExpectedConditions.elementToBeClickable(plusBtn));
+            WebElement increaseBtn = wait.until(ExpectedConditions.visibilityOfElementLocated(plusBtn));
 
-            // ✅ Try direct click
+            wait.until(ExpectedConditions.elementToBeClickable(increaseBtn));
+ 
+            // 🧭 Scroll into view to avoid interception
+
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", increaseBtn);
+ 
+            // ✅ Attempt click with fallback
+
             try {
-                increaseBtn.click();
-                System.out.println("✅ Quantity increased in cart.");
-            } catch (ElementClickInterceptedException e) {
-                System.out.println("⚠️ Click intercepted. Retrying with JS...");
-                ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", increaseBtn);
-                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", increaseBtn);
-                System.out.println("✅ Quantity increased via JS fallback.");
-            }
 
+                increaseBtn.click();
+
+                System.out.println("✅ Quantity increased in cart.");
+
+            } catch (ElementClickInterceptedException e) {
+
+                System.out.println("⚠️ Click intercepted. Retrying with JS...");
+
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", increaseBtn);
+
+                System.out.println("✅ Quantity increased via JS fallback.");
+
+            }
+ 
+        } catch (TimeoutException te) {
+
+            ScreenshotUtil.captureScreenshot(driver, "IncreaseQuantity_Timeout");
+
+            throw new AssertionError("⏳ Timeout waiting for quantity increase button.", te);
+ 
+        } catch (NoSuchElementException ne) {
+
+            ScreenshotUtil.captureScreenshot(driver, "IncreaseQuantity_NoElement");
+
+            throw new AssertionError("🚫 Could not locate the increase quantity button.", ne);
+ 
         } catch (Exception e) {
-            System.out.println("❌ Unexpected error during quantity increase: " + e.getMessage());
-            throw new RuntimeException("❌ Quantity increase failed.");
+
+            ScreenshotUtil.captureScreenshot(driver, "IncreaseQuantity_Unexpected");
+
+            throw new AssertionError("❌ Unexpected error while increasing quantity.", e);
+
         }
+
     }
+
 }
+
+ 
